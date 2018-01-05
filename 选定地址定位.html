@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>自定义点标记内容</title>
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+
+    <style type="text/css">
+
+        .amap-marker .marker-route {
+            position: absolute;
+            width: 40px;
+            height: 44px;
+            color: #e90000;
+            background: url(http://webapi.amap.com/theme/v1.3/images/newpc/poi-1.png) no-repeat;
+            cursor: pointer;
+        }
+
+        .amap-marker .marker-marker-bus-from {
+            background-position: -334px -180px;
+        }
+
+        .amap-toolbar {
+            display: none;
+        }
+    </style>
+
+    <script src="http://cache.amap.com/lbs/static/es5.min.js"></script>
+    <script src="http://webapi.amap.com/maps?v=1.4.3&key=67bdb56a7acf8ef801db1e5454d976f9"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+
+</head>
+<body>
+<div id="container" style="width: 500px;height: 500px;"></div>
+<script src="https://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+<!--根据经纬度加载，并定点-->
+<script>
+    var map, geolocation;
+    //加载地图，调用浏览器定位服务
+    map = new AMap.Map('container', {
+        resizeEnable: true
+    });
+
+    $.ajax({
+        url:'request.txt',
+        type:'get',
+        success:function (data) {
+            var arr1 = eval(data);
+            console.log(arr1[1].city);
+            var a = arr1[1].city;
+            var b = arr1[1].adress;
+            $.ajax({
+                url: "http://restapi.amap.com/v3/geocode/geo?key=40262a699545f3059c65f0ff48d8bd4e&address="+arr1[1].adress+"&city="+arr1[1].city,
+                type: 'get',
+                success: function (data) {
+//             console.log(data.geocodes[0].location);
+                    var arr = data.geocodes[0].location.split(",");
+                    console.log(arr);
+
+                    var map = new AMap.Map('container', {
+                        resizeEnable: true,
+                        zoom: 11,
+                        center: [arr[0], arr[1]]
+
+                    });
+
+                    var marker = new AMap.Marker({ //添加自定义点标记
+                        map: map,
+                        position: [arr[0], arr[1]], //基点位置
+                        offset: new AMap.Pixel(-17, -42), //相对于基点的偏移位置
+                        draggable: true,  //是否可拖动
+                        content: '<div class="marker-route marker-marker-bus-from"></div>'   //自定义点标记覆盖物内容
+                    });
+                },
+                error: function () {
+                    console.log()
+                }
+            })
+        },
+        error:function () {
+            alert(error);
+        }
+    })
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
